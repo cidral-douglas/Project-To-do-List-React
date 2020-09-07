@@ -1,6 +1,6 @@
 # To do List - React Js
 
-![Screenshot](Screenshot.png)
+![Screenshot](screenshot.png)
 
 * 9º projeto, feito em HTML, CSS, JavaScript e React Js.
 * Projeto desenvolvido no curso Full Stack - ProgBr
