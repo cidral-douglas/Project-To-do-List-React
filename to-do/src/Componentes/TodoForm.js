@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { addItem } from '../Actions/listActions';
+import { useDispatch } from 'react-redux';
 
 function TodoForm(props) {
 
     const [text,setText] = useState("");
+    const dispatch = useDispatch();
 
     //FUNÇÃO QUE RECEBE O QUE FOI DIGITADO NO INPUT//
     function handleChange(event) {
@@ -11,18 +14,19 @@ function TodoForm(props) {
     }
 
     //FUNÇÃO QUE ADICIONA OS ITENS//
-    function addItem(event) {
+    function addItemEvent(event) {
         event.preventDefault();
         if(text){
-        props.onAddItem(text);
+        dispatch(addItem(text));
         setText("");
+        props.onHideModal();
         }
     }
     
     return (
         <form>
             <input onChange={handleChange} type="text" value={text} placeholder="Type here..."></input>
-            <button onClick={addItem}>Add</button>
+            <button onClick={addItemEvent}>Add</button>
         </form>
     );
 }

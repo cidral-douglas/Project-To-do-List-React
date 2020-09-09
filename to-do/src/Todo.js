@@ -1,52 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import TodoForm from './Componentes/TodoForm';
 import Modal from './Componentes/Modal';
 import List from './Componentes/List';
 import './Todo.css';
-import Item from './Componentes/Item';
+import listReducer from './Reducers/listReducer';
+
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+
 
 const SAVED_ITEMS = "savedItems";
 
+function persistState(state) {
+    localStorage.setItem(SAVED_ITEMS, JSON.stringify(state));
+}
+
+function loadState() {
+    const actualState = localStorage.getItem(SAVED_ITEMS);
+    if (actualState){
+        return JSON.parse(actualState);
+    } else {
+        return []
+    }
+}
+
+const store = createStore(listReducer, loadState());
+
+store.subscribe(() => {
+    persistState(store.getState())
+})
+
 function Todo() {
     
-    const [items,setItems] = useState([]);
     const [showModal, setShowModal] = useState(false);
-
-    useEffect(() => {
-        let savedItems = JSON.parse(localStorage.getItem(SAVED_ITEMS));
-        if(savedItems){
-            setItems(savedItems);
-        }
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem(SAVED_ITEMS, JSON.stringify(items));
-    }, [items]);
-
-    function onAddItem(text) {
-        let item = new Item(text);
-        setItems([...items, item]);
-        onHideModal();
-    }
-
-    //Filtra os item que não foram clicados para serem excluídos//
-    function onItemDeleted(item) {
-        let filteredItems = items.filter(i => i.id !== item.id);
-
-        setItems(filteredItems);
-    }
-
-    //Muda o estado "done" do item clicado//
-    function onDone(item) {
-        let updatedItems = items.map(i => {
-            if (i.id === item.id){
-                i.done = !i.done;
-            }
-            return i;
-        })
-
-        setItems(updatedItems);
-    }
 
     function onHideModal(event){
             setShowModal(false);
@@ -55,6 +41,8 @@ function Todo() {
     return (
         <div className="container">
 
+        <Provider store={store}>
+
             <header className="header">
                  <h1> To do </h1> 
                  <button onClick={() => {setShowModal(true)}} className="addButton"> + </button>
@@ -62,9 +50,10 @@ function Todo() {
            
             {/*  */}
 
-            <List onDone={onDone} onItemDeleted={onItemDeleted} items={items}></List>
+            <List></List>
 
-            <Modal show={showModal} onHideModal={onHideModal}> <TodoForm onAddItem={onAddItem}></TodoForm> </Modal>
+            <Modal show={showModal} onHideModal={onHideModal}> <TodoForm onHideModal={onHideModal}></TodoForm> </Modal>
+        </Provider>
 
         </div> /*Container*/
     );
